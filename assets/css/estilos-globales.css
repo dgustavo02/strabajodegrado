@@ -1,0 +1,65 @@
+:root {
+  --uts-verde: #1b7f3b;
+  --uts-verde-oscuro: #14602c;
+  --uts-verde-claro: #e8f4ec;
+  --uts-gris: #f4f6f5;
+  --bs-primary: var(--uts-verde);
+  --bs-primary-rgb: 27, 127, 59;
+  --bs-link-color: var(--uts-verde);
+  --bs-link-hover-color: var(--uts-verde-oscuro);
+  --bs-body-font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--uts-verde);
+  --bs-btn-border-color: var(--uts-verde);
+  --bs-btn-hover-bg: var(--uts-verde-oscuro);
+  --bs-btn-hover-border-color: var(--uts-verde-oscuro);
+  --bs-btn-active-bg: var(--uts-verde-oscuro);
+  --bs-btn-active-border-color: var(--uts-verde-oscuro);
+  --bs-btn-disabled-bg: var(--uts-verde);
+  --bs-btn-disabled-border-color: var(--uts-verde);
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--uts-verde);
+  --bs-btn-border-color: var(--uts-verde);
+  --bs-btn-hover-bg: var(--uts-verde);
+  --bs-btn-hover-border-color: var(--uts-verde);
+  --bs-btn-active-bg: var(--uts-verde-oscuro);
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--uts-verde);
+  box-shadow: 0 0 0 .2rem rgba(27, 127, 59, .2);
+}
+
+.brand-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2.5rem; height: 2.5rem; border-radius: 50%;
+  background: #fff; color: var(--uts-verde); font-weight: 800; font-size: .85rem; letter-spacing: .02em;
+}
+.brand-mark-lg { width: 4.5rem; height: 4.5rem; font-size: 1.3rem; }
+
+/* Indicadores de estado por color */
+.estado {
+  display: inline-block; padding: .2rem .65rem; border-radius: 999px;
+  font-size: .78rem; font-weight: 600; white-space: nowrap;
+  background: #e9ecef; color: #495057;
+}
+.estado[data-estado="Aprobada"], .estado[data-estado="Aprobado"], .estado[data-estado="Validada"],
+.estado[data-estado="Finalizado"], .estado[data-estado="Finalizada"], .estado[data-estado="Activo"],
+.estado[data-estado="Asignada"], .estado[data-estado="Director"] { background: #d7f0df; color: #14602c; }
+.estado[data-estado="Pendiente"], .estado[data-estado="Pendiente_validacion"] { background: #fff3cd; color: #7a5b00; }
+.estado[data-estado="En revision"], .estado[data-estado="En comite"], .estado[data-estado="En proceso"],
+.estado[data-estado="Evaluador"] { background: #d6e8fb; color: #0b4f8a; }
+.estado[data-estado="Aplazada"], .estado[data-estado="Aplazado"] { background: #ffe5cc; color: #9a4a00; }
+.estado[data-estado="Rechazada"], .estado[data-estado="Rechazado"], .estado[data-estado="Inactivo"] { background: #f8d7da; color: #842029; }
+.estado[data-estado="Cerrada"] { background: #dee2e6; color: #495057; }
+
+/* Páginas de error */
+.pagina-error-body { background: var(--uts-verde-claro); }
+.pagina-error { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.pagina-error .tarjeta-error {
+  max-width: 28rem; text-align: center; border: 0; border-top: 4px solid var(--uts-verde);
+  box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .08);
+}
+.pagina-error .codigo-error { font-size: 3.5rem; font-weight: 700; color: var(--uts-verde); line-height: 1; }

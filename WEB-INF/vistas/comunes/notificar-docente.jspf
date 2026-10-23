@@ -1,0 +1,5 @@
+<%-- Notifica al docente con una función en el trabajo. Variables: nTrabajo, nFuncion, nTitulo, nMensaje, nTipo --%>
+<sql:update>INSERT INTO notificaciones (usuario_id, titulo, mensaje, tipo)
+  SELECT td.docente_id, ?, ?, ? FROM trabajo_docentes td WHERE td.trabajo_id = ? AND td.funcion = ?
+  <sql:param value="${nTitulo}"/><sql:param value="${nMensaje}"/><sql:param value="${nTipo}"/><sql:param value="${nTrabajo}"/><sql:param value="${nFuncion}"/>
+</sql:update>

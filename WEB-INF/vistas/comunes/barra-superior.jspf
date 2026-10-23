@@ -1,0 +1,26 @@
+<sql:query var="barraNotif">SELECT COUNT(*) AS n FROM notificaciones WHERE usuario_id = ? AND leida = 0<sql:param value="${sessionScope.usuarioId}"/></sql:query>
+<header class="topbar">
+  <button class="btn btn-light btn-sm d-lg-none" type="button" id="btnMenu" aria-label="Abrir menú"><i class="bi bi-list fs-5"></i></button>
+  <div class="topbar-title d-none d-sm-block">Sistema de Gestión de Trabajos de Grado</div>
+  <div class="ms-auto d-flex align-items-center gap-3">
+    <a class="position-relative text-dark" href="${ctx}/panel.jsp?v=notificaciones" aria-label="Notificaciones">
+      <i class="bi bi-bell fs-5"></i>
+      <c:if test="${barraNotif.rows[0].n gt 0}"><span class="badge rounded-pill bg-danger notif-badge">${barraNotif.rows[0].n}</span></c:if>
+    </a>
+    <div class="dropdown">
+      <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-person-circle me-1"></i> <c:out value="${sessionScope.usuarioNombre}"/>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><span class="dropdown-item-text small text-muted"><c:out value="${sessionScope.rol}"/></span></li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <form method="post" action="${ctx}/acciones/cerrar-sesion.jsp" class="px-3">
+            <input type="hidden" name="csrf" value="${sessionScope.csrf}">
+            <button class="btn btn-outline-danger btn-sm w-100" type="submit"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
+          </form>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>

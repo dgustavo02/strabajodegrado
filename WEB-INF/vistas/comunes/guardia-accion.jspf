@@ -1,0 +1,3 @@
+<%-- Las acciones solo aceptan POST --%>
+<c:if test="${pageContext.request.method ne 'POST'}"><c:redirect url="/panel.jsp"/></c:if>
+<%@ include file="/WEB-INF/vistas/comunes/guardia.jspf" %>

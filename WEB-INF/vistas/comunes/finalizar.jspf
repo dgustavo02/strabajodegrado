@@ -1,0 +1,25 @@
+<%-- Cierra una acción: define el mensaje flash y redirige.
+     Variables: errValidacion, err (c:catch), okMsg, destinoOk, destinoErr, destinoId, msgDuplicado --%>
+<c:choose>
+  <c:when test="${not empty errValidacion}">
+    <c:set var="flashTipo" value="warning" scope="session"/>
+    <c:set var="flashMsg" value="${errValidacion}" scope="session"/>
+    <c:set var="destinoFinal" value="${destinoErr}"/>
+  </c:when>
+  <c:when test="${not empty err}">
+    <c:set var="msgError" value="No se pudo completar la operación. Intenta de nuevo."/>
+    <c:catch var="ignorar">
+      <c:if test="${err.cause.SQLState eq '45000'}"><c:set var="msgError" value="${err.cause.message}"/></c:if>
+      <c:if test="${err.cause.SQLState eq '23000'}"><c:set var="msgError" value="${empty msgDuplicado ? 'Ya existe un registro con esos datos.' : msgDuplicado}"/></c:if>
+    </c:catch>
+    <c:set var="flashTipo" value="danger" scope="session"/>
+    <c:set var="flashMsg" value="${msgError}" scope="session"/>
+    <c:set var="destinoFinal" value="${destinoErr}"/>
+  </c:when>
+  <c:otherwise>
+    <c:set var="flashTipo" value="success" scope="session"/>
+    <c:set var="flashMsg" value="${okMsg}" scope="session"/>
+    <c:set var="destinoFinal" value="${destinoOk}"/>
+  </c:otherwise>
+</c:choose>
+<c:redirect url="/panel.jsp"><c:param name="v" value="${destinoFinal}"/><c:param name="id" value="${destinoId}"/></c:redirect>

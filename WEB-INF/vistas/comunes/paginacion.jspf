@@ -1,0 +1,6 @@
+<%-- Calcula pag, porPag y offset a partir del parámetro pag --%>
+<c:set var="pag" value="${1 + 0}"/>
+<c:catch var="ignorar"><c:set var="pag" value="${param.pag + 0}"/></c:catch>
+<c:if test="${pag lt 1}"><c:set var="pag" value="${1 + 0}"/></c:if>
+<c:set var="porPag" value="${10 + 0}"/>
+<c:set var="offset" value="${(pag - 1) * porPag}"/>

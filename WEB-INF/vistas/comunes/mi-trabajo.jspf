@@ -1,0 +1,21 @@
+<%-- Trabajo vigente del estudiante. Define: tengoTrabajo, mt y las banderas de acción permitidas --%>
+<sql:query var="miTrabajo">
+  SELECT t.id, t.estado, t.fase_actual_id, f.nombre AS fase, COALESCE(i.titulo, pe.titulo) AS titulo, COALESCE(i.descripcion, pe.descripcion) AS descripcion,
+         COALESCE(i.modalidad, pe.modalidad) AS modalidad, t.fecha_inicio,
+         (SELECT COUNT(*) FROM entregas e WHERE e.trabajo_id = t.id AND e.fase_id = t.fase_actual_id) AS previas,
+         (SELECT tf.fecha_limite FROM trabajo_fases tf WHERE tf.trabajo_id = t.id AND tf.fase_id = 5) AS limite_final,
+         (SELECT IF(tf.fecha_limite < CURDATE(), 1, 0) FROM trabajo_fases tf WHERE tf.trabajo_id = t.id AND tf.fase_id = 5) AS vencido,
+         (SELECT COUNT(*) FROM trabajo_estudiantes te2 WHERE te2.trabajo_id = t.id) AS n_est
+    FROM trabajo_estudiantes te JOIN trabajos_grado t ON t.id = te.trabajo_id JOIN asignaciones_ideas ai ON ai.id = t.asignacion_idea_id
+    LEFT JOIN ideas i ON i.id = ai.idea_id LEFT JOIN propuestas_estudiantes pe ON pe.id = ai.propuesta_estudiante_id
+    LEFT JOIN fases f ON f.id = t.fase_actual_id
+   WHERE te.estudiante_id = ?
+  <sql:param value="${sessionScope.usuarioId}"/>
+</sql:query>
+<c:set var="tengoTrabajo" value="${miTrabajo.rowCount gt 0}"/>
+<c:if test="${tengoTrabajo}">
+  <c:set var="mt" value="${miTrabajo.rows[0]}"/>
+  <c:set var="puedeAnteproyecto" value="${mt.fase_actual_id eq 3 and mt.estado eq 'Pendiente' and mt.previas eq 0}"/>
+  <c:set var="puedeFinal" value="${mt.fase_actual_id eq 5 and mt.estado eq 'Aprobado' and mt.previas eq 0 and mt.vencido ne 1}"/>
+  <c:set var="puedeCorregir" value="${mt.estado eq 'Aplazado'}"/>
+</c:if>

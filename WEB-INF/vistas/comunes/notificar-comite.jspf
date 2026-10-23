@@ -1,0 +1,5 @@
+<%-- Notifica a todo el Comité activo. Variables: nTitulo, nMensaje, nTipo --%>
+<sql:update>INSERT INTO notificaciones (usuario_id, titulo, mensaje, tipo)
+  SELECT u.id, ?, ?, ? FROM users u JOIN role_user ru ON ru.user_id = u.id WHERE ru.role_id = 2 AND u.estado = 'Activo'
+  <sql:param value="${nTitulo}"/><sql:param value="${nMensaje}"/><sql:param value="${nTipo}"/>
+</sql:update>

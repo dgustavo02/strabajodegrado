@@ -1,0 +1,5 @@
+<%-- Notifica a los estudiantes vinculados a un trabajo. Variables: nTrabajo, nTitulo, nMensaje, nTipo --%>
+<sql:update>INSERT INTO notificaciones (usuario_id, titulo, mensaje, tipo)
+  SELECT te.estudiante_id, ?, ?, ? FROM trabajo_estudiantes te WHERE te.trabajo_id = ?
+  <sql:param value="${nTitulo}"/><sql:param value="${nMensaje}"/><sql:param value="${nTipo}"/><sql:param value="${nTrabajo}"/>
+</sql:update>

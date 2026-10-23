@@ -1,0 +1,29 @@
+<%-- Crea el trabajo de grado a partir de una asignación validada (usar dentro de sql:transaction).
+     Variables: ctAsignacion, ctEst1, ctEst2 (opcional), ctObs --%>
+<sql:update>INSERT INTO trabajos_grado (asignacion_idea_id, estado, fase_actual_id, fecha_inicio) VALUES (?, 'Pendiente', 2, CURDATE())
+  <sql:param value="${ctAsignacion}"/>
+</sql:update>
+<sql:query var="ctNuevo">SELECT LAST_INSERT_ID() AS id</sql:query>
+<c:set var="ctTrabajo" value="${ctNuevo.rows[0].id}"/>
+<sql:update>INSERT INTO trabajo_estudiantes (trabajo_id, estudiante_id) VALUES (?, ?)
+  <sql:param value="${ctTrabajo}"/><sql:param value="${ctEst1}"/>
+</sql:update>
+<c:if test="${not empty ctEst2}">
+  <sql:update>INSERT INTO trabajo_estudiantes (trabajo_id, estudiante_id) VALUES (?, ?)
+    <sql:param value="${ctTrabajo}"/><sql:param value="${ctEst2}"/>
+  </sql:update>
+</c:if>
+<sql:update>INSERT INTO trabajo_fases (trabajo_id, fase_id, estado, fecha_inicio, fecha_fin, observaciones) VALUES (?, 1, 'Aprobada', CURDATE(), CURDATE(), ?)
+  <sql:param value="${ctTrabajo}"/><sql:param value="${ctObs}"/>
+</sql:update>
+<sql:update>INSERT INTO trabajo_fases (trabajo_id, fase_id, estado, fecha_inicio) VALUES (?, 2, 'En proceso', CURDATE())
+  <sql:param value="${ctTrabajo}"/>
+</sql:update>
+<c:set var="nTrabajo" value="${ctTrabajo}"/>
+<c:set var="nTitulo" value="Trabajo de grado creado"/>
+<c:set var="nMensaje" value="Tu trabajo de grado fue creado. El Comité asignará tu Director y Evaluador."/>
+<c:set var="nTipo" value="Trabajo"/>
+<%@ include file="/WEB-INF/vistas/comunes/notificar-estudiantes.jspf" %>
+<c:set var="hEntidad" value="Trabajo"/><c:set var="hId" value="${ctTrabajo}"/><c:set var="hAccion" value="Crear"/>
+<c:set var="hDesc" value="Trabajo creado desde la asignación ${ctAsignacion}"/>
+<%@ include file="/WEB-INF/vistas/comunes/historial.jspf" %>

@@ -1,0 +1,6 @@
+<%-- Conexión a MySQL local. No subas este archivo a GitHub. --%>
+<sql:setDataSource
+    driver="com.mysql.cj.jdbc.Driver"
+    url="jdbc:mysql://b9rh9ncvp7f0gxbpq9nh-mysql.services.clever-cloud.com:3306/b9rh9ncvp7f0gxbpq9nh?useSSL=false&serverTimezone=UTC"
+    user="urqod88xk02ogi9b"
+    password="6PeR7kVSYcXNfxX5TM6A" />

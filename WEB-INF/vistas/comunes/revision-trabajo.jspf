@@ -1,0 +1,67 @@
+<%-- Revisión de un trabajo por su Director o Evaluador. Variables: funcionReq, turnoEstado, volverV --%>
+<sql:query var="t">
+  SELECT t.id, t.estado, f.nombre AS fase, COALESCE(i.titulo, pe.titulo) AS titulo, COALESCE(i.descripcion, pe.descripcion) AS descripcion,
+         COALESCE(i.modalidad, pe.modalidad) AS modalidad
+    FROM trabajo_docentes td JOIN trabajos_grado t ON t.id = td.trabajo_id JOIN asignaciones_ideas ai ON ai.id = t.asignacion_idea_id
+    LEFT JOIN ideas i ON i.id = ai.idea_id LEFT JOIN propuestas_estudiantes pe ON pe.id = ai.propuesta_estudiante_id
+    LEFT JOIN fases f ON f.id = t.fase_actual_id
+   WHERE t.id = ? AND td.docente_id = ? AND td.funcion = ?
+  <sql:param value="${param.id}"/><sql:param value="${sessionScope.usuarioId}"/><sql:param value="${funcionReq}"/>
+</sql:query>
+<c:choose>
+  <c:when test="${t.rowCount eq 0}"><div class="alert alert-warning">No tienes la función de ${funcionReq} en este trabajo. <a href="${ctx}/panel.jsp?v=${volverV}">Volver</a></div></c:when>
+  <c:otherwise>
+    <c:set var="tr" value="${t.rows[0]}"/>
+    <sql:query var="est">SELECT u.nombre, u.documento, u.email_institucional AS correo, u.nivel FROM trabajo_estudiantes te JOIN users u ON u.id = te.estudiante_id WHERE te.trabajo_id = ?<sql:param value="${tr.id}"/></sql:query>
+    <sql:query var="otro">SELECT td.funcion, u.nombre, u.email_institucional AS correo FROM trabajo_docentes td JOIN users u ON u.id = td.docente_id WHERE td.trabajo_id = ? AND td.funcion <> ?<sql:param value="${tr.id}"/><sql:param value="${funcionReq}"/></sql:query>
+    <sql:query var="abierto">SELECT estado FROM entregas WHERE trabajo_id = ? AND estado IN ('Pendiente','En revision','En comite') ORDER BY id DESC LIMIT 1<sql:param value="${tr.id}"/></sql:query>
+    <c:set var="miTurno" value="${abierto.rowCount gt 0 and abierto.rows[0].estado eq turnoEstado}"/>
+    <div class="page-header d-flex justify-content-between align-items-center">
+      <div><h1><c:out value="${tr.titulo}"/></h1><p><span class="estado" data-estado="${tr.estado}">${tr.estado}</span> · <c:out value="${tr.modalidad}"/> · Fase: <c:out value="${empty tr.fase ? '—' : tr.fase}"/></p></div>
+      <a class="btn btn-outline-secondary" href="${ctx}/panel.jsp?v=${volverV}"><i class="bi bi-arrow-left"></i> Volver</a>
+    </div>
+    <div class="row g-3">
+      <div class="col-lg-7">
+        <div class="panel"><h2>Descripción</h2><p class="texto-largo mb-0"><c:out value="${tr.descripcion}"/></p></div>
+        <h2 class="h5 mb-3">Fases del proyecto</h2>
+        <c:set var="fpTrabajo" value="${tr.id}"/><c:set var="fpVerEvaluador" value="1"/><c:set var="fpVerPrivados" value="0"/>
+        <%@ include file="/WEB-INF/vistas/comunes/fases-proyecto.jspf" %>
+      </div>
+      <div class="col-lg-5">
+        <div class="panel">
+          <h2>Participantes</h2>
+          <div class="dato-etiqueta">Estudiante(s)</div>
+          <c:forEach var="e" items="${est.rows}"><div class="mb-2"><c:out value="${e.nombre}"/> (<c:out value="${e.documento}"/>)<br><small class="text-muted"><c:out value="${e.correo}"/> · <c:out value="${e.nivel}"/></small></div></c:forEach>
+          <c:if test="${est.rowCount eq 0}"><p class="text-muted">Sin estudiantes vinculados.</p></c:if>
+          <c:forEach var="o" items="${otro.rows}"><div class="dato-etiqueta mt-2">${o.funcion}</div><c:out value="${o.nombre}"/><br><small class="text-muted"><c:out value="${o.correo}"/></small></c:forEach>
+        </div>
+        <div class="panel ${miTurno ? 'border border-success' : ''}">
+          <h2>Mi evaluación (${funcionReq})</h2>
+          <c:choose>
+            <c:when test="${miTurno}">
+              <form method="post" action="${ctx}/acciones/evaluaciones/registrar.jsp" class="validar" novalidate>
+                <input type="hidden" name="csrf" value="${sessionScope.csrf}"><input type="hidden" name="trabajo" value="${tr.id}">
+                <div class="mb-3"><label class="form-label" for="calificacion">Calificación (0 a 5, opcional)</label><input class="form-control" type="number" id="calificacion" name="calificacion" min="0" max="5" step="0.1"></div>
+                <div class="mb-3"><label class="form-label" for="observaciones">Observaciones y correcciones requeridas</label><textarea class="form-control" id="observaciones" name="observaciones" rows="5" maxlength="3000" required minlength="5" data-max="3000"></textarea></div>
+                <div class="d-flex flex-wrap gap-2">
+                  <button class="btn btn-primary btn-sm" type="submit" name="decision" value="Aprobado"><i class="bi bi-check2-circle"></i> Aprobar</button>
+                  <button class="btn btn-outline-warning btn-sm" type="submit" name="decision" value="Aplazado"><i class="bi bi-arrow-counterclockwise"></i> Aplazar</button>
+                  <button class="btn btn-outline-danger btn-sm" type="submit" name="decision" value="Rechazado"><i class="bi bi-x-circle"></i> Rechazar</button>
+                </div>
+              </form>
+            </c:when>
+            <c:otherwise>
+              <p class="text-muted mb-0">
+                <c:choose>
+                  <c:when test="${funcionReq eq 'Evaluador' and abierto.rowCount gt 0 and abierto.rows[0].estado eq 'Pendiente'}">Aún no es tu turno: primero debe revisar el Director.</c:when>
+                  <c:when test="${abierto.rowCount eq 0}">No hay entregas pendientes de tu revisión.</c:when>
+                  <c:otherwise>Esta entrega ya fue revisada por ti y avanzó en el proceso.</c:otherwise>
+                </c:choose>
+              </p>
+            </c:otherwise>
+          </c:choose>
+        </div>
+      </div>
+    </div>
+  </c:otherwise>
+</c:choose>

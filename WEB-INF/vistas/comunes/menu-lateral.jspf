@@ -1,0 +1,51 @@
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <span class="brand-mark">UTS</span>
+    <div class="lh-sm"><strong>Trabajos de Grado</strong><small class="d-block text-white-50"><c:out value="${sessionScope.rol}"/></small></div>
+  </div>
+  <nav class="sidebar-nav">
+    <c:choose>
+
+      <c:when test="${sessionScope.carpeta eq 'administrador'}">
+        <a class="${vistaActual eq 'dashboard' ? 'active' : ''}" href="${ctx}/panel.jsp?v=dashboard"><i class="bi bi-speedometer2"></i> Inicio</a>
+        <a class="${fn:startsWith(vistaActual, 'usuarios/') and vistaActual ne 'usuarios/crear' ? 'active' : ''}" href="${ctx}/panel.jsp?v=usuarios/listar"><i class="bi bi-people"></i> Usuarios</a>
+        <a class="${vistaActual eq 'usuarios/crear' ? 'active' : ''}" href="${ctx}/panel.jsp?v=usuarios/crear"><i class="bi bi-person-plus"></i> Nuevo usuario</a>
+      </c:when>
+
+      <c:when test="${sessionScope.carpeta eq 'comite'}">
+        <a class="${vistaActual eq 'dashboard' ? 'active' : ''}" href="${ctx}/panel.jsp?v=dashboard"><i class="bi bi-speedometer2"></i> Inicio</a>
+        <a class="${fn:startsWith(vistaActual, 'ideas/') ? 'active' : ''}" href="${ctx}/panel.jsp?v=ideas/listar"><i class="bi bi-lightbulb"></i> Ideas de docentes</a>
+        <a class="${fn:startsWith(vistaActual, 'propuestas/') ? 'active' : ''}" href="${ctx}/panel.jsp?v=propuestas/listar"><i class="bi bi-journal-text"></i> Propuestas de estudiantes</a>
+        <a class="${vistaActual eq 'asignaciones/pagos' ? 'active' : ''}" href="${ctx}/panel.jsp?v=asignaciones/pagos"><i class="bi bi-receipt"></i> Pagos y asignaciones</a>
+        <a class="${fn:startsWith(vistaActual, 'trabajos/') or fn:startsWith(vistaActual, 'asignaciones/d') or fn:startsWith(vistaActual, 'asignaciones/e') ? 'active' : ''}" href="${ctx}/panel.jsp?v=trabajos/listar"><i class="bi bi-mortarboard"></i> Trabajos de grado</a>
+        <a class="${fn:startsWith(vistaActual, 'solicitudes/') ? 'active' : ''}" href="${ctx}/panel.jsp?v=solicitudes/listar"><i class="bi bi-inbox"></i> Solicitudes</a>
+        <a class="${fn:startsWith(vistaActual, 'actas/') ? 'active' : ''}" href="${ctx}/panel.jsp?v=actas/listar"><i class="bi bi-file-earmark-text"></i> Actas</a>
+      </c:when>
+
+      <c:when test="${sessionScope.carpeta eq 'docente'}">
+        <sql:query var="menuFun">SELECT COALESCE(SUM(funcion = 'Director'), 0) AS d, COALESCE(SUM(funcion = 'Evaluador'), 0) AS e FROM trabajo_docentes WHERE docente_id = ?<sql:param value="${sessionScope.usuarioId}"/></sql:query>
+        <a class="${vistaActual eq 'dashboard' ? 'active' : ''}" href="${ctx}/panel.jsp?v=dashboard"><i class="bi bi-speedometer2"></i> Inicio</a>
+        <a class="${vistaActual eq 'ideas/mis-ideas' ? 'active' : ''}" href="${ctx}/panel.jsp?v=ideas/mis-ideas"><i class="bi bi-lightbulb"></i> Mis ideas</a>
+        <a class="${vistaActual eq 'ideas/crear' ? 'active' : ''}" href="${ctx}/panel.jsp?v=ideas/crear"><i class="bi bi-plus-circle"></i> Proponer idea</a>
+        <a class="${vistaActual eq 'trabajos/asignados' ? 'active' : ''}" href="${ctx}/panel.jsp?v=trabajos/asignados"><i class="bi bi-mortarboard"></i> Trabajos asignados</a>
+        <c:if test="${menuFun.rows[0].d gt 0}">
+          <a class="${fn:startsWith(vistaActual, 'director/') ? 'active' : ''}" href="${ctx}/panel.jsp?v=director/revisiones"><i class="bi bi-person-check"></i> Como Director</a>
+        </c:if>
+        <c:if test="${menuFun.rows[0].e gt 0}">
+          <a class="${fn:startsWith(vistaActual, 'evaluador/') ? 'active' : ''}" href="${ctx}/panel.jsp?v=evaluador/proyectos"><i class="bi bi-clipboard-check"></i> Como Evaluador</a>
+        </c:if>
+        <a class="${vistaActual eq 'historial' ? 'active' : ''}" href="${ctx}/panel.jsp?v=historial"><i class="bi bi-clock-history"></i> Historial</a>
+      </c:when>
+
+      <c:otherwise>
+        <a class="${vistaActual eq 'dashboard' ? 'active' : ''}" href="${ctx}/panel.jsp?v=dashboard"><i class="bi bi-speedometer2"></i> Inicio</a>
+        <a class="${fn:startsWith(vistaActual, 'ideas/') or fn:startsWith(vistaActual, 'asignaciones/') ? 'active' : ''}" href="${ctx}/panel.jsp?v=ideas/banco"><i class="bi bi-lightbulb"></i> Banco de ideas</a>
+        <a class="${fn:startsWith(vistaActual, 'propuestas/') ? 'active' : ''}" href="${ctx}/panel.jsp?v=propuestas/crear"><i class="bi bi-journal-plus"></i> Mi propuesta</a>
+        <a class="${vistaActual eq 'trabajo/mi-trabajo' ? 'active' : ''}" href="${ctx}/panel.jsp?v=trabajo/mi-trabajo"><i class="bi bi-mortarboard"></i> Mi trabajo</a>
+        <a class="${fn:startsWith(vistaActual, 'entregas/') ? 'active' : ''}" href="${ctx}/panel.jsp?v=entregas/listar"><i class="bi bi-cloud-upload"></i> Entregas</a>
+        <a class="${fn:startsWith(vistaActual, 'solicitudes/') ? 'active' : ''}" href="${ctx}/panel.jsp?v=solicitudes/listar"><i class="bi bi-inbox"></i> Solicitudes</a>
+      </c:otherwise>
+    </c:choose>
+    <a class="${vistaActual eq 'notificaciones' ? 'active' : ''}" href="${ctx}/panel.jsp?v=notificaciones"><i class="bi bi-bell"></i> Notificaciones</a>
+  </nav>
+</aside>

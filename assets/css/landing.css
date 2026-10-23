@@ -1,0 +1,127 @@
+html { scroll-behavior: smooth; }
+.landing-page { color: #24312a; }
+
+/* NAVEGACIÓN */
+.landing-nav { background: transparent; transition: background .3s, box-shadow .3s; padding: .9rem 0; }
+.landing-nav .navbar-brand, .landing-nav .nav-link, .landing-nav small { color: #fff; }
+.landing-nav .navbar-toggler { color: #fff; border-color: rgba(255,255,255,.5); font-size: 1.4rem; }
+.landing-nav.scrolled { background: rgba(34, 104, 62, 0.95); backdrop-filter: blur(10px); box-shadow: 0 .25rem 1rem rgba(0,0,0,.15); padding: .5rem 0; }
+.landing-nav .btn-primary { --bs-btn-bg: #fff; --bs-btn-color: var(--uts-verde); --bs-btn-border-color: #fff; --bs-btn-hover-bg: var(--uts-verde-claro); --bs-btn-hover-color: var(--uts-verde-oscuro); --bs-btn-hover-border-color: var(--uts-verde-claro); }
+@media (max-width: 991.98px) { .landing-nav { background: var(--uts-verde); } }
+
+/* HERO (Fondo con luces y cuadrícula CSS) */
+.hero {
+  background-color: #0d2a1a;
+  /* Patrón de cuadrícula sutil + degradado verde */
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 15% 50%, rgba(58, 155, 87, 0.4), transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(34, 104, 62, 0.6), transparent 50%);
+  background-size: 40px 40px, 40px 40px, 100% 100%, 100% 100%;
+  color: #fff; padding: 10rem 0 7rem; position: relative; overflow: hidden;
+}
+
+/* Efecto "Brillo" (Glow) detrás del texto */
+.hero::before {
+  content: ""; position: absolute; top: -10%; left: -10%;
+  width: 50%; height: 50%;
+  background: var(--uts-verde); filter: blur(120px); opacity: 0.4;
+  border-radius: 50%; z-index: 0;
+}
+
+.hero .container { position: relative; z-index: 1; }
+.hero-text { animation: subir .8s ease both; }
+.hero-chip { display: inline-flex; gap: .4rem; align-items: center; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); padding: .4rem 1rem; border-radius: 999px; font-size: .9rem; backdrop-filter: blur(8px); }
+
+/* TARJETA DEL HERO (Efecto Cristal) */
+.hero-card { 
+  background: rgba(255,255,255,.05); 
+  border: 1px solid rgba(255,255,255,.15); 
+  border-radius: 1.5rem; 
+  padding: 2rem; 
+  backdrop-filter: blur(16px); 
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  animation: subir 1s .2s ease both; 
+}
+.hero-step { display: flex; gap: 1rem; align-items: center; padding: .8rem 0; }
+.hero-step + .hero-step { border-top: 1px solid rgba(255,255,255,.1); }
+.hero-step i { font-size: 1.5rem; width: 3rem; height: 3rem; display: grid; place-items: center; background: linear-gradient(135deg, #fff, #e0e0e0); color: var(--uts-verde-oscuro); border-radius: 1rem; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+.hero-step strong { font-size: 1.1rem; letter-spacing: .5px; }
+.hero-step small { display: block; opacity: .7; margin-top: 2px; }
+
+/* SECCIONES Y TARJETAS */
+.seccion { padding: 6rem 0; position: relative; }
+.seccion-alt { background: #f8faf9; }
+.titulo-seccion { text-align: center; max-width: 40rem; margin: 0 auto 4rem; }
+.titulo-seccion h2 { font-weight: 800; color: var(--uts-verde-oscuro); letter-spacing: -0.5px; }
+.titulo-seccion p { color: #5d6b63; font-size: 1.1rem; }
+
+.tarjeta { 
+  background: #fff; 
+  border-radius: 1.5rem; 
+  padding: 2.5rem 2rem; 
+  height: 100%; 
+  box-shadow: 0 10px 40px rgba(0,0,0,.04); 
+  border: 1px solid rgba(0,0,0,.04);
+  transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  position: relative;
+  overflow: hidden;
+}
+.tarjeta::before {
+  content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+  background: var(--uts-verde); transform: scaleX(0); transform-origin: left; transition: transform .4s ease;
+}
+.tarjeta:hover { 
+  transform: translateY(-10px); 
+  box-shadow: 0 20px 50px rgba(0,0,0,.08); 
+  border-color: rgba(34, 104, 62, 0.1);
+}
+.tarjeta:hover::before { transform: scaleX(1); }
+
+.tarjeta .icono { 
+  width: 3.5rem; height: 3.5rem; display: grid; place-items: center; 
+  font-size: 1.6rem; border-radius: 1rem; 
+  background: linear-gradient(135deg, var(--uts-verde-claro), #e6f7ec); 
+  color: var(--uts-verde-oscuro); margin-bottom: 1.5rem; 
+}
+.tarjeta h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: .8rem; color: var(--uts-verde-oscuro); }
+.tarjeta p { color: #5d6b63; margin: 0; font-size: .95rem; line-height: 1.6; }
+
+/* LÍNEA DE TIEMPO */
+.linea-tiempo { list-style: none; padding: 0; margin: 0 auto; max-width: 46rem; position: relative; }
+.linea-tiempo::before { content: ""; position: absolute; left: 1.45rem; top: 1rem; bottom: 1rem; width: 2px; background: linear-gradient(to bottom, var(--uts-verde-claro), var(--uts-verde)); border-radius: 5px; }
+.linea-tiempo li { display: flex; gap: 1.5rem; padding: 1.5rem 0; position: relative; }
+.linea-tiempo .punto { 
+  flex: 0 0 3rem; height: 3rem; border-radius: 50%; display: grid; place-items: center; 
+  background: var(--uts-verde); color: #fff; font-weight: 700; z-index: 1; 
+  box-shadow: 0 0 0 6px rgba(34, 104, 62, 0.1); /* Anillo de luz */
+}
+.linea-tiempo h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: .4rem; color: var(--uts-verde-oscuro); }
+.linea-tiempo p { margin: 0; color: #5d6b63; }
+
+/* CTA FINAL */
+.cta { 
+  background: var(--uts-verde-oscuro); 
+  color: #fff; padding: 6rem 0; 
+  position: relative;
+  overflow: hidden;
+}
+.cta::after {
+  content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 80%; height: 80%; background: radial-gradient(circle, rgba(58, 155, 87, 0.5) 0%, transparent 70%);
+  z-index: 0; pointer-events: none;
+}
+.cta .container { position: relative; z-index: 1; }
+.cta h2 { font-weight: 800; font-size: 2.5rem; }
+.cta p { opacity: .9; font-size: 1.1rem; }
+.landing-footer { background: #0a1c12; color: #8ba896; padding: 2rem 0; font-size: .9rem; border-top: 1px solid rgba(255,255,255,.05); }
+
+/* ANIMACIONES */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity .8s ease, transform .8s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+@keyframes subir { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .hero-text, .hero-card { transition: none; animation: none; opacity: 1; transform: none; }
+  html { scroll-behavior: auto; }
+}

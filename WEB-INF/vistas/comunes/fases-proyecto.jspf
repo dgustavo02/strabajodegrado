@@ -1,0 +1,165 @@
+<%-- Tarjetas de las fases de un trabajo, con enlaces y observaciones.
+     Variables: fpTrabajo (id), fpVerEvaluador ('1'/'0'), fpVerPrivados ('1'/'0': pago y prueba TyT) --%>
+<sql:query var="fpTrab">
+  SELECT t.id, t.estado, t.fase_actual_id, COALESCE(i.titulo, pe.titulo) AS titulo, COALESCE(i.modalidad, pe.modalidad) AS modalidad,
+         IF(ai.idea_id IS NULL, 'Propuesta del estudiante', 'Banco de ideas') AS origen, ai.estado AS asig_estado,
+         COALESCE(ai.observaciones, pe.observaciones_comite) AS asig_obs, ai.fecha_validacion,
+         COALESCE(ai.comprobante_pago_url, pe.comprobante_pago_url) AS pago_url
+    FROM trabajos_grado t JOIN asignaciones_ideas ai ON ai.id = t.asignacion_idea_id
+    LEFT JOIN ideas i ON i.id = ai.idea_id LEFT JOIN propuestas_estudiantes pe ON pe.id = ai.propuesta_estudiante_id
+   WHERE t.id = ?
+  <sql:param value="${fpTrabajo}"/>
+</sql:query>
+<c:if test="${fpTrab.rowCount gt 0}">
+  <c:set var="fpT" value="${fpTrab.rows[0]}"/>
+  <sql:query var="fpFases">
+    SELECT f.id, f.nombre, f.orden, tf.estado, tf.fecha_inicio, tf.fecha_limite, tf.fecha_fin, tf.observaciones
+      FROM fases f LEFT JOIN trabajo_fases tf ON tf.fase_id = f.id AND tf.trabajo_id = ? ORDER BY f.orden
+    <sql:param value="${fpTrabajo}"/>
+  </sql:query>
+  <sql:query var="fpEnt">SELECT fase_id, tipo, titulo, version, url, estado, fecha_entrega FROM entregas WHERE trabajo_id = ? ORDER BY fase_id, tipo, version DESC<sql:param value="${fpTrabajo}"/></sql:query>
+  <%-- El nombre del Evaluador solo se consulta cuando el visitante puede verlo --%>
+  <sql:query var="fpEvs">
+    SELECT ev.fase_id, ev.calificacion, ev.estado, ev.observaciones, ev.fecha_evaluacion, td.funcion,
+           IF(? = '1' OR td.funcion = 'Director', u.nombre, NULL) AS docente
+      FROM evaluaciones ev JOIN users u ON u.id = ev.docente_id
+      LEFT JOIN trabajo_docentes td ON td.trabajo_id = ev.trabajo_id AND td.docente_id = ev.docente_id
+     WHERE ev.trabajo_id = ? ORDER BY ev.id
+    <sql:param value="${fpVerEvaluador}"/><sql:param value="${fpTrabajo}"/>
+  </sql:query>
+  <sql:query var="fpActas">
+    SELECT a.decision, a.observaciones, a.fecha_acta,
+           IF(a.fecha_acta > COALESCE((SELECT MIN(e.fecha_entrega) FROM entregas e WHERE e.trabajo_id = a.trabajo_id AND e.fase_id = 5), '9999-12-31 00:00:00'), 5, 4) AS fase_id
+      FROM actas a WHERE a.trabajo_id = ? ORDER BY a.id
+    <sql:param value="${fpTrabajo}"/>
+  </sql:query>
+  <sql:query var="fpDocs">
+    SELECT td.funcion, u.nombre FROM trabajo_docentes td JOIN users u ON u.id = td.docente_id
+     WHERE td.trabajo_id = ? AND (td.funcion = 'Director' OR ? = '1') ORDER BY td.funcion
+    <sql:param value="${fpTrabajo}"/><sql:param value="${fpVerEvaluador}"/>
+  </sql:query>
+  <c:if test="${fpVerPrivados eq '1'}">
+    <sql:query var="fpTyt">
+      SELECT s.url, s.estado, s.respuesta, s.fecha_solicitud, u.nombre FROM solicitudes s JOIN users u ON u.id = s.usuario_id
+       WHERE s.tipo = 'Prueba TyT' AND s.usuario_id IN (SELECT estudiante_id FROM trabajo_estudiantes WHERE trabajo_id = ?) ORDER BY s.id DESC
+      <sql:param value="${fpTrabajo}"/>
+    </sql:query>
+  </c:if>
+
+  <div class="fases-proyecto">
+    <c:forEach var="f" items="${fpFases.rows}">
+      <c:set var="fpHecha" value="${f.estado eq 'Aprobada' or f.estado eq 'Finalizada'}"/>
+      <c:set var="fpActual" value="${f.id eq fpT.fase_actual_id}"/>
+      <c:set var="fpSin" value="${empty f.estado}"/>
+      <div class="fase-card ${fpActual ? 'actual' : ''} ${fpHecha ? 'hecha' : ''} ${fpSin ? 'sin-iniciar' : ''}">
+        <button class="fase-head" type="button" data-bs-toggle="collapse" data-bs-target="#fp${f.id}" aria-expanded="${fpActual}" aria-controls="fp${f.id}">
+          <span class="fase-num"><c:choose><c:when test="${fpHecha}"><i class="bi bi-check-lg"></i></c:when><c:otherwise>${f.orden}</c:otherwise></c:choose></span>
+          <span class="fase-titulo">
+            <strong><c:out value="${f.nombre}"/></strong>
+            <small>
+              <c:if test="${fpActual}"><span class="fase-actual-tag">Fase actual</span> </c:if>
+              <c:if test="${not empty f.fecha_inicio}">Inicio ${fn:substring(f.fecha_inicio, 8, 10)}/${fn:substring(f.fecha_inicio, 5, 7)}/${fn:substring(f.fecha_inicio, 0, 4)}</c:if>
+              <c:if test="${not empty f.fecha_limite}"> · Límite ${fn:substring(f.fecha_limite, 8, 10)}/${fn:substring(f.fecha_limite, 5, 7)}/${fn:substring(f.fecha_limite, 0, 4)}</c:if>
+              <c:if test="${not empty f.fecha_fin}"> · Fin ${fn:substring(f.fecha_fin, 8, 10)}/${fn:substring(f.fecha_fin, 5, 7)}/${fn:substring(f.fecha_fin, 0, 4)}</c:if>
+            </small>
+          </span>
+          <span class="estado" data-estado="${fpSin ? 'Pendiente' : f.estado}">${fpSin ? 'Sin iniciar' : f.estado}</span>
+          <i class="bi bi-chevron-down fase-flecha"></i>
+        </button>
+        <div id="fp${f.id}" class="collapse ${fpActual ? 'show' : ''}">
+          <div class="fase-body">
+            <c:if test="${fpSin}"><p class="text-muted mb-0">Esta fase aún no ha iniciado.</p></c:if>
+            <c:if test="${not empty f.observaciones}"><div class="fase-bloque"><div class="dato-etiqueta">Observaciones de la fase</div><div class="texto-largo"><c:out value="${f.observaciones}"/></div></div></c:if>
+
+            <%-- Fase 0: validaciones iniciales y prueba TyT --%>
+            <c:if test="${f.id eq 1 and fpVerPrivados eq '1'}">
+              <div class="fase-bloque"><div class="dato-etiqueta">Prueba TyT</div>
+                <c:forEach var="y" items="${fpTyt.rows}">
+                  <div class="fase-item"><a href="<c:out value='${y.url}'/>" target="_blank" rel="noopener noreferrer"><i class="bi bi-box-arrow-up-right"></i> Resultado de <c:out value="${y.nombre}"/></a>
+                    <span class="estado" data-estado="${y.estado}">${y.estado eq 'Aprobada' ? 'Verificada' : y.estado}</span>
+                    <small class="text-muted">${fn:substring(y.fecha_solicitud, 8, 10)}/${fn:substring(y.fecha_solicitud, 5, 7)}/${fn:substring(y.fecha_solicitud, 0, 4)}</small></div>
+                </c:forEach>
+                <c:if test="${fpTyt.rowCount eq 0}"><span class="text-muted small">Aún no se ha registrado el enlace de la prueba TyT.</span></c:if>
+              </div>
+            </c:if>
+
+            <%-- Fase 1: idea, pago y asignación --%>
+            <c:if test="${f.id eq 2}">
+              <div class="fase-bloque"><div class="dato-etiqueta">Idea</div><strong><c:out value="${fpT.titulo}"/></strong>
+                <div class="small text-muted"><c:out value="${fpT.modalidad}"/> · <c:out value="${fpT.origen}"/></div></div>
+              <c:if test="${fpVerPrivados eq '1' and not empty fpT.pago_url}">
+                <div class="fase-bloque"><div class="dato-etiqueta">Comprobante de pago</div>
+                  <a href="<c:out value='${fpT.pago_url}'/>" target="_blank" rel="noopener noreferrer"><i class="bi bi-box-arrow-up-right"></i> Abrir comprobante</a>
+                  <span class="estado ms-2" data-estado="${fpT.asig_estado}">${fpT.asig_estado}</span></div>
+              </c:if>
+              <c:if test="${not empty fpT.asig_obs}"><div class="fase-bloque"><div class="dato-etiqueta">Observaciones del Comité</div><div class="texto-largo"><c:out value="${fpT.asig_obs}"/></div></div></c:if>
+              <div class="fase-bloque"><div class="dato-etiqueta">Docentes asignados</div>
+                <c:forEach var="d" items="${fpDocs.rows}"><div><span class="estado" data-estado="${d.funcion}">${d.funcion}</span> <c:out value="${d.nombre}"/></div></c:forEach>
+                <c:if test="${fpDocs.rowCount eq 0}"><span class="text-muted small">Pendiente de asignación por el Comité.</span></c:if>
+              </div>
+            </c:if>
+
+            <%-- Entregas de la fase (anteproyecto y trabajo final) --%>
+            <c:if test="${f.id eq 3 or f.id eq 5}">
+              <div class="fase-bloque"><div class="dato-etiqueta">Documentos entregados</div>
+                <c:set var="fpHayEnt" value="false"/>
+                <c:forEach var="e" items="${fpEnt.rows}">
+                  <c:if test="${e.fase_id eq f.id}">
+                    <c:set var="fpHayEnt" value="true"/>
+                    <div class="fase-item">
+                      <a href="<c:out value='${e.url}'/>" target="_blank" rel="noopener noreferrer"><i class="bi bi-box-arrow-up-right"></i> <c:out value="${e.tipo}"/> · v${e.version}</a>
+                      <span class="estado" data-estado="${e.estado}">${e.estado}</span>
+                      <small class="text-muted">${fn:substring(e.fecha_entrega, 8, 10)}/${fn:substring(e.fecha_entrega, 5, 7)}/${fn:substring(e.fecha_entrega, 0, 4)}</small>
+                      <c:if test="${e.titulo ne e.tipo}"><div class="small text-muted"><c:out value="${e.titulo}"/></div></c:if>
+                    </div>
+                  </c:if>
+                </c:forEach>
+                <c:if test="${fpHayEnt ne 'true'}"><span class="text-muted small">Aún no se han registrado documentos.</span></c:if>
+              </div>
+            </c:if>
+
+            <%-- Revisiones: Director en anteproyecto, Evaluador en la fase 3, ambos en el trabajo final --%>
+            <c:if test="${f.id eq 3 or f.id eq 4 or f.id eq 5}">
+              <c:set var="fpHayRev" value="false"/>
+              <div class="fase-bloque"><div class="dato-etiqueta">Revisiones y calificaciones</div>
+                <c:forEach var="v" items="${fpEvs.rows}">
+                  <c:set var="fpMuestra" value="${(f.id eq 3 and v.fase_id eq 3 and v.funcion ne 'Evaluador') or (f.id eq 4 and v.fase_id eq 3 and v.funcion eq 'Evaluador') or (f.id eq 5 and v.fase_id eq 5)}"/>
+                  <c:if test="${fpMuestra}">
+                    <c:set var="fpHayRev" value="true"/>
+                    <div class="fase-item">
+                      <div class="d-flex justify-content-between flex-wrap gap-1">
+                        <strong><c:choose><c:when test="${not empty v.docente}"><c:out value="${v.funcion}"/>: <c:out value="${v.docente}"/></c:when><c:otherwise>Evaluación</c:otherwise></c:choose></strong>
+                        <span><span class="estado" data-estado="${v.estado}">${v.estado}</span><c:if test="${not empty v.calificacion}"> <span class="fw-semibold ms-1">${v.calificacion}</span></c:if></span>
+                      </div>
+                      <div class="texto-largo small"><c:out value="${v.observaciones}"/></div>
+                      <small class="text-muted">${fn:substring(v.fecha_evaluacion, 8, 10)}/${fn:substring(v.fecha_evaluacion, 5, 7)}/${fn:substring(v.fecha_evaluacion, 0, 4)}</small>
+                    </div>
+                  </c:if>
+                </c:forEach>
+                <c:if test="${fpHayRev ne 'true'}"><span class="text-muted small">Aún no hay revisiones en esta fase.</span></c:if>
+              </div>
+            </c:if>
+
+            <%-- Decisiones del Comité --%>
+            <c:if test="${f.id eq 4 or f.id eq 5}">
+              <c:set var="fpHayActa" value="false"/>
+              <div class="fase-bloque"><div class="dato-etiqueta">Decisiones del Comité</div>
+                <c:forEach var="a" items="${fpActas.rows}">
+                  <c:if test="${a.fase_id eq f.id}">
+                    <c:set var="fpHayActa" value="true"/>
+                    <div class="fase-item">
+                      <div class="d-flex justify-content-between"><strong>Comité</strong><span class="estado" data-estado="${a.decision}">${a.decision}</span></div>
+                      <div class="texto-largo small"><c:out value="${a.observaciones}"/></div>
+                      <small class="text-muted">${fn:substring(a.fecha_acta, 8, 10)}/${fn:substring(a.fecha_acta, 5, 7)}/${fn:substring(a.fecha_acta, 0, 4)}</small>
+                    </div>
+                  </c:if>
+                </c:forEach>
+                <c:if test="${fpHayActa ne 'true'}"><span class="text-muted small">Aún no hay decisiones del Comité en esta fase.</span></c:if>
+              </div>
+            </c:if>
+          </div>
+        </div>
+      </div>
+    </c:forEach>
+  </div>
+</c:if>

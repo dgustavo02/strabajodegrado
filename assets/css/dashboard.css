@@ -1,0 +1,66 @@
+.app-body { background: var(--uts-gris); }
+.app-shell { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 16.5rem; flex: 0 0 16.5rem; background: linear-gradient(180deg, var(--uts-verde-oscuro), var(--uts-verde));
+  color: #fff; position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 1040;
+}
+.sidebar-brand { display: flex; gap: .75rem; align-items: center; padding: 1.25rem 1rem; border-bottom: 1px solid rgba(255,255,255,.15); }
+.sidebar-nav { display: flex; flex-direction: column; padding: .75rem; gap: .2rem; }
+.sidebar-nav a { color: rgba(255,255,255,.88); text-decoration: none; padding: .65rem .85rem; border-radius: .6rem; display: flex; gap: .7rem; align-items: center; transition: background .2s; }
+.sidebar-nav a:hover { background: rgba(255,255,255,.12); color: #fff; }
+.sidebar-nav a.active { background: #fff; color: var(--uts-verde-oscuro); font-weight: 600; }
+.app-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.topbar { background: #fff; display: flex; align-items: center; gap: 1rem; padding: .7rem 1.25rem; box-shadow: 0 1px 0 rgba(0,0,0,.06); position: sticky; top: 0; z-index: 1030; }
+.topbar-title { font-weight: 600; color: var(--uts-verde-oscuro); }
+.notif-badge { position: absolute; top: -.5rem; right: -.6rem; font-size: .65rem; }
+.app-content { padding: 1.5rem; max-width: 80rem; width: 100%; }
+.page-header { margin-bottom: 1.25rem; }
+.page-header h1 { font-size: 1.5rem; font-weight: 700; margin: 0; color: #1f2d25; }
+.page-header p { margin: .2rem 0 0; color: #6b7a72; }
+
+.stat-card { background: #fff; border-radius: .9rem; padding: 1.1rem 1.25rem; box-shadow: 0 .15rem .6rem rgba(0,0,0,.05); display: flex; gap: 1rem; align-items: center; text-decoration: none; color: inherit; height: 100%; transition: transform .2s, box-shadow .2s; animation: entrar .4s ease both; }
+a.stat-card:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.1); color: inherit; }
+.stat-card .stat-icon { width: 3rem; height: 3rem; border-radius: .8rem; display: grid; place-items: center; font-size: 1.4rem; background: var(--uts-verde-claro); color: var(--uts-verde); }
+.stat-card .stat-num { font-size: 1.6rem; font-weight: 700; line-height: 1; }
+.stat-card .stat-label { color: #6b7a72; font-size: .85rem; }
+.stat-card.alerta .stat-icon { background: #fff3cd; color: #7a5b00; }
+.stat-card.peligro .stat-icon { background: #f8d7da; color: #842029; }
+@keyframes entrar { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.panel { background: #fff; border-radius: .9rem; padding: 1.25rem; box-shadow: 0 .15rem .6rem rgba(0,0,0,.05); margin-bottom: 1.25rem; }
+.panel h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; }
+.table > :not(caption) > * > * { padding: .7rem .75rem; }
+.table thead th { font-size: .78rem; text-transform: uppercase; letter-spacing: .03em; color: #6b7a72; border-bottom-width: 1px; }
+.dato-etiqueta { font-size: .78rem; text-transform: uppercase; letter-spacing: .03em; color: #6b7a72; }
+.texto-largo { white-space: pre-line; }
+details.revision { border: 1px solid #dfe5e1; border-radius: .6rem; padding: .5rem .85rem; }
+details.revision summary { cursor: pointer; font-weight: 600; color: var(--uts-verde-oscuro); }
+details.revision[open] { background: #fbfdfc; }
+
+@media (max-width: 991.98px) {
+  .sidebar { position: fixed; left: -17rem; transition: left .25s; }
+  .sidebar.abierto { left: 0; box-shadow: 0 0 2rem rgba(0,0,0,.35); }
+  .app-content { padding: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) { .stat-card { animation: none; } .sidebar { transition: none; } }
+/* Tarjetas de fases del proyecto */
+.fases-proyecto { display: flex; flex-direction: column; gap: .75rem; }
+.fase-card { background: #fff; border-radius: .9rem; border: 1px solid #e3e8e5; border-left: 5px solid #ced4da; box-shadow: 0 .15rem .6rem rgba(0,0,0,.04); overflow: hidden; }
+.fase-card.actual { border-left-color: var(--uts-verde); box-shadow: 0 .3rem 1rem rgba(27,127,59,.15); }
+.fase-card.hecha { border-left-color: #6cc28a; }
+.fase-card.sin-iniciar { opacity: .8; }
+.fase-head { width: 100%; display: flex; align-items: center; gap: .85rem; padding: .85rem 1rem; background: transparent; border: 0; text-align: left; cursor: pointer; }
+.fase-head:hover { background: #f7faf8; }
+.fase-num { flex: 0 0 2.2rem; width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: #e9ecef; color: #495057; }
+.fase-card.actual .fase-num { background: var(--uts-verde); color: #fff; }
+.fase-card.hecha .fase-num { background: #d7f0df; color: var(--uts-verde-oscuro); }
+.fase-titulo { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.fase-titulo small { color: #6b7a72; }
+.fase-actual-tag { display: inline-block; background: var(--uts-verde-claro); color: var(--uts-verde-oscuro); font-weight: 600; border-radius: .4rem; padding: 0 .4rem; }
+.fase-flecha { transition: transform .2s; color: #6b7a72; }
+.fase-head[aria-expanded="true"] .fase-flecha { transform: rotate(180deg); }
+.fase-body { padding: .25rem 1rem 1rem 4rem; }
+.fase-bloque { margin-bottom: .9rem; }
+.fase-item { padding: .45rem .6rem; border-left: 3px solid var(--uts-verde-claro); background: #fbfdfc; border-radius: .3rem; margin-top: .4rem; }
+@media (max-width: 575.98px) { .fase-body { padding-left: 1rem; } }
+@media (prefers-reduced-motion: reduce) { .fase-flecha { transition: none; } }

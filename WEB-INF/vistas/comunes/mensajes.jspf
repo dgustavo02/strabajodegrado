@@ -1,0 +1,8 @@
+<c:if test="${not empty sessionScope.flashMsg}">
+  <div class="alert alert-${empty sessionScope.flashTipo ? 'info' : sessionScope.flashTipo} alert-dismissible fade show" role="alert" data-autodismiss>
+    <c:out value="${sessionScope.flashMsg}"/>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+  </div>
+  <c:remove var="flashMsg" scope="session"/>
+  <c:remove var="flashTipo" scope="session"/>
+</c:if>

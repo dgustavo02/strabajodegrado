@@ -1,0 +1,15 @@
+<%-- Variables: totalFilas, baseV. Conserva q, rol, estado, modalidad y fase --%>
+<c:set var="resto" value="${(totalFilas + porPag - 1) mod porPag}"/>
+<c:set var="totalPag" value="${((totalFilas + porPag - 1) - resto) div porPag}"/>
+<c:if test="${totalPag gt 1}">
+  <nav aria-label="Paginación"><ul class="pagination pagination-sm justify-content-center mb-0">
+    <c:forEach begin="1" end="${totalPag}" var="i">
+      <c:url var="enlacePag" value="/panel.jsp">
+        <c:param name="v" value="${baseV}"/><c:param name="q" value="${param.q}"/><c:param name="rol" value="${param.rol}"/>
+        <c:param name="estado" value="${param.estado}"/><c:param name="modalidad" value="${param.modalidad}"/>
+        <c:param name="fase" value="${param.fase}"/><c:param name="pag" value="${i}"/>
+      </c:url>
+      <li class="page-item ${i eq pag ? 'active' : ''}"><a class="page-link" href="${enlacePag}">${i}</a></li>
+    </c:forEach>
+  </ul></nav>
+</c:if>

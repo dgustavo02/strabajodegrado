@@ -1,0 +1,4 @@
+<%-- Variables: hEntidad, hId, hAccion, hDesc --%>
+<sql:update>INSERT INTO historial (usuario_id, entidad, entidad_id, accion, descripcion) VALUES (?, ?, ?, ?, ?)
+  <sql:param value="${sessionScope.usuarioId}"/><sql:param value="${hEntidad}"/><sql:param value="${hId}"/><sql:param value="${hAccion}"/><sql:param value="${hDesc}"/>
+</sql:update>

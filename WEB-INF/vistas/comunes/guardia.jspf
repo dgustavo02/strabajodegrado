@@ -1,0 +1,16 @@
+<%-- Control de acceso: sesión, usuario activo, rol requerido y token CSRF en POST --%>
+<c:set var="ignorar" value="${pageContext.response.setHeader('Cache-Control','no-store, no-cache, must-revalidate')}"/>
+<c:if test="${empty sessionScope.usuarioId}"><c:redirect url="/login.jsp"/></c:if>
+<sql:query var="chkUsuario">SELECT estado FROM users WHERE id = ?<sql:param value="${sessionScope.usuarioId}"/></sql:query>
+<c:if test="${chkUsuario.rowCount eq 0 or chkUsuario.rows[0].estado ne 'Activo'}">
+  <c:set var="ignorar" value="${pageContext.session.invalidate()}"/>
+  <c:redirect url="/login.jsp"/>
+</c:if>
+<c:if test="${not empty rolRequerido and sessionScope.carpeta ne rolRequerido}">
+  <c:set var="ignorar" value="${pageContext.response.setStatus(403)}"/>
+  <jsp:forward page="/WEB-INF/vistas/errores/403.jsp"/>
+</c:if>
+<c:if test="${pageContext.request.method eq 'POST' and (empty param.csrf or param.csrf ne sessionScope.csrf)}">
+  <c:set var="ignorar" value="${pageContext.response.setStatus(403)}"/>
+  <jsp:forward page="/WEB-INF/vistas/errores/403.jsp"/>
+</c:if>
